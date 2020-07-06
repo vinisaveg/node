@@ -1,7 +1,6 @@
 import { Server } from './src/server'
 import { usersRouter } from './src/users/users.router'
 
-
 const server = new Server()
 
 server.bootstrap([usersRouter]).then(server => {

@@ -21,6 +21,29 @@ class UsersRouter extends router_1.Router {
                 return next();
             });
         });
+        application.get('/next', [
+            (request, response, next) => {
+                if (request.userAgent().includes('Mozilla/4.0')) {
+                    let error = new Error();
+                    error.message = "Please, update your browser.";
+                    error.statusCode = 400;
+                    return next(error);
+                }
+                return next();
+            },
+            (request, response, next) => {
+                response.setHeader("content-type", "application/json");
+                response.status(200);
+                response.json({
+                    browser: request.userAgent(),
+                    method: request.method,
+                    url: request.url,
+                    path: request.path(),
+                    query: request.query
+                });
+                return next();
+            }
+        ]);
     }
 }
 exports.usersRouter = new UsersRouter();
