@@ -4,8 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const restify_1 = __importDefault(require("restify"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const environment_1 = require("./common/environment");
 class Server {
+    initializeDb() {
+        // (<any>mongoose).Promise = global.Promise
+        return mongoose_1.default.connect(environment_1.environment.db.url, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+    }
     initRoutes(routers) {
         return new Promise((resolve, reject) => {
             try {
@@ -28,7 +36,7 @@ class Server {
         });
     }
     bootstrap(routers = []) {
-        return this.initRoutes(routers).then(() => this);
+        return this.initializeDb().then(() => this.initRoutes(routers).then(() => this));
     }
 }
 exports.Server = Server;

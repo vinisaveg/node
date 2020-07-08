@@ -8,11 +8,16 @@
     "dev": "nodemon ./dist/main.js"
   },
   "dependencies": {
+    "mongoose": "^5.9.22",
     "nodemon": "^2.0.4",
     "restify": "6.3.4"
   },
   "devDependencies": {
+    "@types/mongoose": "^5.7.30",
     "@types/restify": "^8.4.2",
     "typescript": "^3.9.6"
+  },
+  "peerDependencies": {
+    "mongoose": "^5.9.22"
   }
 }
