@@ -22,6 +22,7 @@ class Server {
                     version: "1.0.0"
                 });
                 this.application.use(restify_1.default.plugins.queryParser());
+                this.application.use(restify_1.default.plugins.bodyParser());
                 // routes
                 for (let router of routers) {
                     router.applyRoutes(this.application);

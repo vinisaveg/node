@@ -8,7 +8,7 @@ class UsersRouter extends Router {
 
         application.get("/users", (request, response, next) => {
             
-            User.findAll().then(users => {
+            User.find().then(users => {
                 response.json({users})
             })
 
@@ -25,6 +25,21 @@ class UsersRouter extends Router {
 
                 response.status(404)
                 response.json({error: "User not found"})
+                return next()
+            })
+
+        })
+
+        application.post('/users', (request, response, next) => {
+
+            // const { name, email, password } = request.body
+            let newUser = new User(request.body)
+
+            newUser.save().then(user => {
+                // user.password = ''
+                response.status(201)
+                response.json({user})
+
                 return next()
             })
 

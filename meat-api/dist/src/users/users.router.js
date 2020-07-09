@@ -5,7 +5,7 @@ const users_model_1 = require("./users.model");
 class UsersRouter extends router_1.Router {
     applyRoutes(application) {
         application.get("/users", (request, response, next) => {
-            users_model_1.User.findAll().then(users => {
+            users_model_1.User.find().then(users => {
                 response.json({ users });
             });
         });
@@ -18,6 +18,16 @@ class UsersRouter extends router_1.Router {
                 }
                 response.status(404);
                 response.json({ error: "User not found" });
+                return next();
+            });
+        });
+        application.post('/users', (request, response, next) => {
+            // const { name, email, password } = request.body
+            let newUser = new users_model_1.User(request.body);
+            newUser.save().then(user => {
+                // user.password = ''
+                response.status(201);
+                response.json({ user });
                 return next();
             });
         });
