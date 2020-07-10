@@ -1,4 +1,4 @@
-import { Server } from './src/server'
+import { Server } from './src/server/server'
 import { usersRouter } from './src/users/users.router'
 
 const server = new Server()

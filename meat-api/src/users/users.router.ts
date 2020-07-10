@@ -1,5 +1,5 @@
 import { Router } from '../common/router'
-import restify from 'restify'
+import restify, {Response, Request} from 'restify'
 import { User } from './users.model'
 
 class UsersRouter extends Router {
@@ -8,31 +8,19 @@ class UsersRouter extends Router {
 
         application.get("/users", (request, response, next) => {
             
-            User.find().then(users => {
-                response.json({users})
-            })
+            User.find().then(this.render(response, next))
 
         })
 
         application.get('/users/:id', (request, response, next) => {
 
             const id = request.params.id
-            User.findById(id).then(user => {
-                if(user){
-                    response.json({user})
-                    return next()
-                }
-
-                response.status(404)
-                response.json({error: "User not found"})
-                return next()
-            })
+            User.findById(id).then(this.render(response, next))
 
         })
 
         application.post('/users', (request, response, next) => {
 
-            // const { name, email, password } = request.body
             let newUser = new User(request.body)
 
             newUser.save().then(user => {
@@ -43,6 +31,59 @@ class UsersRouter extends Router {
                 return next()
             })
 
+        })
+
+        application.put('/users/:id', (request: Request, response: Response, next) => {
+
+            let options = { useFindAndModify: false, overwrite: true }
+
+            User.findByIdAndUpdate({ _id: request.params.id }, request.body, options)
+                .then(result => {
+                    if(result){
+                        return User.findById(request.params.id)
+                    }else {
+                        response.status(404)
+                        response.json({error: "not found"})
+                    }
+                }).then(user => {
+                    response.json(user)
+                    return next()
+                })
+                .catch(error => {
+                    response.json({error})
+                    return next()
+                })
+
+        })
+
+        application.patch('/users/:id', (request: Request, response: Response, next) => {
+            
+            let options = { new: true, useFindAndModify: false }
+
+            User.findByIdAndUpdate(request.params.id, request.body, options)
+                .then(this.render(response, next))
+
+        })
+
+        application.del('/users/:id', (request: Request, response: Response, next) => {
+
+            User.findByIdAndDelete({ _id: request.params.id })
+                .then(result => {
+                    if(result?.$isDeleted) {
+                        response.status(204)
+                        response.json({ result })
+                        return next()
+
+                    } else {
+                        response.status(400)
+                        response.json({ message: "Could not find user" })
+                        return next()
+                    }
+
+                }).catch(error => {
+                    response.json({ error })
+                    return next()
+                })
         })
 
         application.get('/next', 

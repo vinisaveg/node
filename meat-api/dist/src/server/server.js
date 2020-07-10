@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const restify_1 = __importDefault(require("restify"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const environment_1 = require("./common/environment");
+const environment_1 = require("../common/environment");
+const merge_patch_parser_1 = require("./merge-patch.parser");
 class Server {
     initializeDb() {
         // (<any>mongoose).Promise = global.Promise
@@ -24,6 +25,7 @@ class Server {
                 });
                 this.application.use(restify_1.default.plugins.queryParser());
                 this.application.use(restify_1.default.plugins.bodyParser());
+                this.application.use(merge_patch_parser_1.mergePatchBodyParser);
                 // routes
                 for (let router of routers) {
                     router.applyRoutes(this.application);
