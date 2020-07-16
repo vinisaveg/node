@@ -40,7 +40,7 @@ export class Server {
                     resolve(this.application)
                 })
 
-                this.application.on('error', handleError)
+                this.application.on('Error', handleError)
 
             }catch(error) {
                 reject(error)

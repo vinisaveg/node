@@ -30,21 +30,21 @@ class UsersRouter extends router_1.Router {
                 .catch(next);
         });
         application.put('/users/:id', (request, response, next) => {
-            let options = { useFindAndModify: false, overwrite: true };
+            let options = { runValidators: true, useFindAndModify: false, overwrite: true };
             users_model_1.User.findByIdAndUpdate({ _id: request.params.id }, request.body, options)
                 .then(result => {
                 if (result) {
                     return users_model_1.User.findById(request.params.id);
                 }
                 else {
-                    throw new restify_errors_1.NotFoundError({ error: "not found" });
+                    throw new restify_errors_1.NotFoundError({ error: "Document not found" });
                 }
             })
                 .then(this.render(response, next))
                 .catch(next);
         });
         application.patch('/users/:id', (request, response, next) => {
-            let options = { new: true, useFindAndModify: false };
+            let options = { runValidators: true, new: true, useFindAndModify: false };
             users_model_1.User.findByIdAndUpdate(request.params.id, request.body, options)
                 .then(this.render(response, next))
                 .catch(next);

@@ -45,14 +45,14 @@ class UsersRouter extends Router {
 
         application.put('/users/:id', (request: Request, response: Response, next) => {
 
-            let options = { useFindAndModify: false, overwrite: true }
+            let options = { runValidators: true, useFindAndModify: false, overwrite: true }
 
             User.findByIdAndUpdate({ _id: request.params.id }, request.body, options)
                 .then(result => {
                     if(result){
                         return User.findById(request.params.id)
                     }else {
-                        throw new NotFoundError({error: "not found"})
+                        throw new NotFoundError({error: "Document not found"})
                     }
                 })
                 .then(this.render(response, next))
@@ -62,7 +62,7 @@ class UsersRouter extends Router {
 
         application.patch('/users/:id', (request: Request, response: Response, next) => {
             
-            let options = { new: true, useFindAndModify: false }
+            let options = { runValidators: true, new: true, useFindAndModify: false }
 
             User.findByIdAndUpdate(request.params.id, request.body, options)
                 .then(this.render(response, next))

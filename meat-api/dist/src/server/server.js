@@ -34,7 +34,7 @@ class Server {
                 this.application.listen(environment_1.environment.server.port, () => {
                     resolve(this.application);
                 });
-                this.application.on('error', error_handler_1.handleError);
+                this.application.on('Error', error_handler_1.handleError);
             }
             catch (error) {
                 reject(error);

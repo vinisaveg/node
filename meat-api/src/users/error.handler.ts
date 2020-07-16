@@ -10,12 +10,22 @@ export const handleError = (request: Request, response: Response, error: any, do
 
     switch(error.name) {
         case 'MongoError':
-            if(error.code === 11000) {
+            if(error.code === 1100) {
                 error.statusCode = 400
             }
             break;
         case 'ValidationError':
             error.statusCode = 400
+            const messages: Array<any> = []
+
+            for(let name in error.errors) {
+                messages.push( {message: error.errors[name].message} )
+            }
+
+            error.toJSON = () => ({
+                errors: messages
+            })
+
             break;
     }
 

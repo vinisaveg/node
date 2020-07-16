@@ -1,4 +1,4 @@
-import restify, {Request, Response} from 'restify'
+import { Request, Response } from 'restify'
 import { BadRequestError } from 'restify-errors'
 
 const mpContentType = 'application/merge-patch+json'
