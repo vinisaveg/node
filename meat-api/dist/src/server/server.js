@@ -7,6 +7,7 @@ const restify_1 = __importDefault(require("restify"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const environment_1 = require("../common/environment");
 const merge_patch_parser_1 = require("./merge-patch.parser");
+const error_handler_1 = require("../users/error.handler");
 class Server {
     initializeDb() {
         // (<any>mongoose).Promise = global.Promise
@@ -33,6 +34,7 @@ class Server {
                 this.application.listen(environment_1.environment.server.port, () => {
                     resolve(this.application);
                 });
+                this.application.on('restifyError', error_handler_1.handleError);
             }
             catch (error) {
                 reject(error);

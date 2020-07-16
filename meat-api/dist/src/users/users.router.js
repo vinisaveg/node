@@ -2,14 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const router_1 = require("../common/router");
 const users_model_1 = require("./users.model");
+const restify_errors_1 = require("restify-errors");
 class UsersRouter extends router_1.Router {
     applyRoutes(application) {
         application.get("/users", (request, response, next) => {
-            users_model_1.User.find().then(this.render(response, next));
+            users_model_1.User.find()
+                .then(this.render(response, next))
+                .catch(next);
         });
         application.get('/users/:id', (request, response, next) => {
             const id = request.params.id;
-            users_model_1.User.findById(id).then(this.render(response, next));
+            users_model_1.User.findById(id)
+                .then(this.render(response, next))
+                .catch(next);
         });
         application.post('/users', (request, response, next) => {
             let newUser = new users_model_1.User(request.body);
@@ -18,7 +23,8 @@ class UsersRouter extends router_1.Router {
                 response.status(201);
                 response.json({ user });
                 return next();
-            });
+            })
+                .catch(next);
         });
         application.put('/users/:id', (request, response, next) => {
             let options = { useFindAndModify: false, overwrite: true };
@@ -28,41 +34,27 @@ class UsersRouter extends router_1.Router {
                     return users_model_1.User.findById(request.params.id);
                 }
                 else {
-                    response.status(404);
-                    response.json({ error: "not found" });
+                    throw new restify_errors_1.NotFoundError({ error: "not found" });
                 }
             }).then(user => {
                 response.json(user);
                 return next();
             })
-                .catch(error => {
-                response.json({ error });
-                return next();
-            });
+                .catch(next);
         });
         application.patch('/users/:id', (request, response, next) => {
             let options = { new: true, useFindAndModify: false };
             users_model_1.User.findByIdAndUpdate(request.params.id, request.body, options)
-                .then(this.render(response, next));
+                .then(this.render(response, next))
+                .catch(next);
         });
         application.del('/users/:id', (request, response, next) => {
             users_model_1.User.findByIdAndDelete({ _id: request.params.id })
                 .then(result => {
-                var _a;
-                if ((_a = result) === null || _a === void 0 ? void 0 : _a.$isDeleted) {
-                    response.status(204);
-                    response.json({ result });
-                    return next();
-                }
-                else {
-                    response.status(400);
-                    response.json({ message: "Could not find user" });
-                    return next();
-                }
-            }).catch(error => {
-                response.json({ error });
+                response.status(204);
+                response.json({ result });
                 return next();
-            });
+            }).catch(next);
         });
         application.get('/next', [
             (request, response, next) => {

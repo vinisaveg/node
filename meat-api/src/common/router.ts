@@ -1,4 +1,5 @@
 import restify, { Response, Next } from 'restify'
+import { NotFoundError } from 'restify-errors'
 // import { EventEmitter } from 'events'
 
 export abstract class Router {
@@ -10,7 +11,7 @@ export abstract class Router {
             if(document) {
                 response.json(document)
             } else {
-                response.send(404)
+                throw new NotFoundError('Document not found')
             }
 
             return next()

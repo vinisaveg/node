@@ -1,6 +1,7 @@
 import { Router } from '../common/router'
 import restify, {Response, Request} from 'restify'
 import { User } from './users.model'
+import { NotFoundError } from 'restify-errors'
 
 class UsersRouter extends Router {
     
@@ -8,14 +9,18 @@ class UsersRouter extends Router {
 
         application.get("/users", (request, response, next) => {
             
-            User.find().then(this.render(response, next))
+            User.find()
+                .then(this.render(response, next))
+                .catch(next)
 
         })
 
         application.get('/users/:id', (request, response, next) => {
 
             const id = request.params.id
-            User.findById(id).then(this.render(response, next))
+            User.findById(id)
+                .then(this.render(response, next))
+                .catch(next)
 
         })
 
@@ -30,7 +35,8 @@ class UsersRouter extends Router {
 
                 return next()
             })
-
+            .catch(next)
+            
         })
 
         application.put('/users/:id', (request: Request, response: Response, next) => {
@@ -42,17 +48,13 @@ class UsersRouter extends Router {
                     if(result){
                         return User.findById(request.params.id)
                     }else {
-                        response.status(404)
-                        response.json({error: "not found"})
+                        throw new NotFoundError({error: "not found"})
                     }
                 }).then(user => {
                     response.json(user)
                     return next()
                 })
-                .catch(error => {
-                    response.json({error})
-                    return next()
-                })
+                .catch(next)
 
         })
 
@@ -62,28 +64,17 @@ class UsersRouter extends Router {
 
             User.findByIdAndUpdate(request.params.id, request.body, options)
                 .then(this.render(response, next))
-
+                .catch(next)
         })
 
         application.del('/users/:id', (request: Request, response: Response, next) => {
 
             User.findByIdAndDelete({ _id: request.params.id })
                 .then(result => {
-                    if(result?.$isDeleted) {
                         response.status(204)
                         response.json({ result })
                         return next()
-
-                    } else {
-                        response.status(400)
-                        response.json({ message: "Could not find user" })
-                        return next()
-                    }
-
-                }).catch(error => {
-                    response.json({ error })
-                    return next()
-                })
+                }).catch(next)
         })
 
         application.get('/next', 
