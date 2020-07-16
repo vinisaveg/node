@@ -1,4 +1,4 @@
-import restify from 'restify'
+import { Request, Response } from 'restify'
 
 export const handleError = (request: Request, response: Response, error: any, done: any) => {
 

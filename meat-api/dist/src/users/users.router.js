@@ -4,6 +4,13 @@ const router_1 = require("../common/router");
 const users_model_1 = require("./users.model");
 const restify_errors_1 = require("restify-errors");
 class UsersRouter extends router_1.Router {
+    constructor() {
+        super();
+        this.on('beforeRender', document => {
+            document.password = undefined;
+            // delete document.password
+        });
+    }
     applyRoutes(application) {
         application.get("/users", (request, response, next) => {
             users_model_1.User.find()
@@ -18,12 +25,8 @@ class UsersRouter extends router_1.Router {
         });
         application.post('/users', (request, response, next) => {
             let newUser = new users_model_1.User(request.body);
-            newUser.save().then(user => {
-                // user.password = ''
-                response.status(201);
-                response.json({ user });
-                return next();
-            })
+            newUser.save()
+                .then(this.render(response, next))
                 .catch(next);
         });
         application.put('/users/:id', (request, response, next) => {
@@ -36,10 +39,8 @@ class UsersRouter extends router_1.Router {
                 else {
                     throw new restify_errors_1.NotFoundError({ error: "not found" });
                 }
-            }).then(user => {
-                response.json(user);
-                return next();
             })
+                .then(this.render(response, next))
                 .catch(next);
         });
         application.patch('/users/:id', (request, response, next) => {
@@ -54,31 +55,35 @@ class UsersRouter extends router_1.Router {
                 response.status(204);
                 response.json({ result });
                 return next();
-            }).catch(next);
+            })
+                .catch(next);
         });
-        application.get('/next', [
-            (request, response, next) => {
-                if (request.userAgent().includes('Mozilla/4.0')) {
-                    let error = new Error();
-                    error.message = "Please, update your browser.";
-                    error.statusCode = 400;
-                    return next(error);
-                }
-                return next();
-            },
-            (request, response, next) => {
-                response.setHeader("content-type", "application/json");
-                response.status(200);
-                response.json({
-                    browser: request.userAgent(),
-                    method: request.method,
-                    url: request.url,
-                    path: request.path(),
-                    query: request.query
-                });
-                return next();
-            }
-        ]);
+        // TEST
+        //     application.get('/next', 
+        //     [
+        //         (request, response, next) => {
+        //         if(request.userAgent().includes('Mozilla/4.0')){
+        //                 let error: any = new Error()
+        //                 error.message = "Please, update your browser."
+        //                 error.statusCode = 400
+        //                 return next(error)
+        //         }
+        //             return next()
+        //         },
+        //         (request, response, next) => {
+        //         response.setHeader("content-type", "application/json")
+        //         response.status(200)
+        //         response.json({
+        //             browser: request.userAgent(),
+        //             method: request.method,
+        //             url: request.url,
+        //             path: request.path(),
+        //             query: request.query
+        //         })
+        //         return next()
+        //         }
+        //     ]
+        // )
     }
 }
 exports.usersRouter = new UsersRouter();

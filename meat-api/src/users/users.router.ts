@@ -4,6 +4,15 @@ import { User } from './users.model'
 import { NotFoundError } from 'restify-errors'
 
 class UsersRouter extends Router {
+
+    constructor() {
+        super()
+
+        this.on('beforeRender', document => {
+            document.password = undefined
+            // delete document.password
+        })
+    }
     
     applyRoutes(application: restify.Server) {
 
@@ -15,7 +24,7 @@ class UsersRouter extends Router {
 
         })
 
-        application.get('/users/:id', (request, response, next) => {
+        application.get('/users/:id', (request: Request, response: Response, next) => {
 
             const id = request.params.id
             User.findById(id)
@@ -24,18 +33,13 @@ class UsersRouter extends Router {
 
         })
 
-        application.post('/users', (request, response, next) => {
+        application.post('/users', (request: Request, response: Response, next) => {
 
             let newUser = new User(request.body)
 
-            newUser.save().then(user => {
-                // user.password = ''
-                response.status(201)
-                response.json({user})
-
-                return next()
-            })
-            .catch(next)
+            newUser.save()
+                .then(this.render(response, next))
+                .catch(next)
             
         })
 
@@ -50,10 +54,8 @@ class UsersRouter extends Router {
                     }else {
                         throw new NotFoundError({error: "not found"})
                     }
-                }).then(user => {
-                    response.json(user)
-                    return next()
                 })
+                .then(this.render(response, next))
                 .catch(next)
 
         })
@@ -74,43 +76,45 @@ class UsersRouter extends Router {
                         response.status(204)
                         response.json({ result })
                         return next()
-                }).catch(next)
+                })
+                .catch(next)
         })
 
-        application.get('/next', 
+    // TEST
+    //     application.get('/next', 
 
-        [
-            (request, response, next) => {
+    //     [
+    //         (request, response, next) => {
 
-            if(request.userAgent().includes('Mozilla/4.0')){
+    //         if(request.userAgent().includes('Mozilla/4.0')){
 
-                    let error: any = new Error()
-                    error.message = "Please, update your browser."
-                    error.statusCode = 400
+    //                 let error: any = new Error()
+    //                 error.message = "Please, update your browser."
+    //                 error.statusCode = 400
 
-                    return next(error)
-            }
+    //                 return next(error)
+    //         }
 
-                return next()
-            },
+    //             return next()
+    //         },
 
-            (request, response, next) => {
+    //         (request, response, next) => {
 
-            response.setHeader("content-type", "application/json")
-            response.status(200)
-            response.json({
-                browser: request.userAgent(),
-                method: request.method,
-                url: request.url,
-                path: request.path(),
-                query: request.query
-            })
+    //         response.setHeader("content-type", "application/json")
+    //         response.status(200)
+    //         response.json({
+    //             browser: request.userAgent(),
+    //             method: request.method,
+    //             url: request.url,
+    //             path: request.path(),
+    //             query: request.query
+    //         })
 
-            return next()
+    //         return next()
 
-            }
-        ]
-    )
+    //         }
+    //     ]
+    // )
 
     }
 
