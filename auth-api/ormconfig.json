@@ -1,0 +1,11 @@
+{
+  "type": "postgres",
+  "host": "localhost",
+  "port": 5432,
+  "username": "root",
+  "password": "",
+  "database": "authapi",
+  "logging": false,
+  "entities": ["src/app/models/*.ts"],
+  "migrations": ["src/database/migrations/*.ts"]
+}
