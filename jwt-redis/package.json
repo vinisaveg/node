@@ -16,6 +16,6 @@
     "@types/redis": "^2.8.27",
     "jsonwebtoken": "^8.5.1",
     "jwt-redis": "^6.0.0",
-    "redis": "^3.0.2"
+    "redis": "^3.1.1"
   }
 }
